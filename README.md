@@ -60,6 +60,7 @@ docker-compose.yaml позволяет осуществить интеграци
 * webhook - инстанс __webhook-service__
 
 ###unit тесты
+
 Для тестирования модуля  ```HttpService``` реализован набор тестов ```HttpServiceLogicSpec```.
 Для тестирования модуля  ```AppConfig``` реализован набор тестов ```AppSettingsParsingSpec```. 
 Для тестирования функционала обработки сообщений реализован набор тестов ```KafkaWorkerSpec```
