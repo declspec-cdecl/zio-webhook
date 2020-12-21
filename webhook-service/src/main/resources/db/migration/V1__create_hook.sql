@@ -1,0 +1,4 @@
+CREATE TABLE "Subscriptions"(
+	"id" int PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+	"url" text NOT NULL
+	);

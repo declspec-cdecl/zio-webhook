@@ -1,0 +1,16 @@
+<configuration>
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
+            <layout class="tofu.logging.ELKLayout"/>
+        </encoder>
+    </appender>
+    <logger name="org.apache.kafka" level="warn"/>
+    <logger name="org.http4s.blaze" level="warn"/>
+    <logger name="com.zaxxer.hikari" level="warn"/>
+    <logger name="org.flywaydb.core" level="warn"/>
+    <logger name="org.http4s.server.blaze" level="warn"/>
+
+    <root level="info">
+        <appender-ref ref="STDOUT"/>
+    </root>
+</configuration>

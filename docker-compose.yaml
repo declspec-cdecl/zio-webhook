@@ -1,0 +1,70 @@
+version: "3.9"
+services:
+  consumer1:
+    image: zipimp/simple-http-event-consumer:0.1
+  consumer2:
+    image: zipimp/simple-http-event-consumer:0.1
+  db:
+    image: postgres:12.2
+    environment:
+      - POSTGRES_PASSWORD=${DB_PSWD}
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_DB=${DB_NAME}
+    ports:
+      - "5445:5432"
+    volumes:
+      - db-data:/var/lib/postgresql/data
+  zookeeper:
+    image: bitnami/zookeeper:3.6.2
+    ports:
+      - "2181:2181"
+    volumes:
+      - zookeeper_data:/bitnami
+    environment:
+      - ALLOW_ANONYMOUS_LOGIN=yes
+  kafka:
+    image: bitnami/kafka:2.6.0
+    ports:
+      - "9093:9093"
+    volumes:
+      - kafka_data:/bitnami
+    environment:
+      - KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper:2181
+      - ALLOW_PLAINTEXT_LISTENER=yes
+      - KAFKA_BROKER_ID=1
+      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CLIENT:PLAINTEXT,EXTERNAL:PLAINTEXT
+      - KAFKA_CFG_LISTENERS=CLIENT://:9092,EXTERNAL://:9093
+      - KAFKA_CFG_ADVERTISED_LISTENERS=CLIENT://kafka:9092,EXTERNAL://kafka:9093
+      - KAFKA_INTER_BROKER_LISTENER_NAME=CLIENT
+    depends_on:
+      - zookeeper
+  sender:
+    image: zipimp/simple-kafka-sender:0.1
+    environment:
+      - bootstrapserver=kafka:9092
+      - sendingintervalmillis=3000
+      - topic=messages
+    depends_on:
+      - kafka
+  webhook:
+    image: zipimp/webhook-service:0.1
+    ports:
+    - "9000:9000"
+    environment:
+      - retryseconds=20
+      - bootstrapserver=kafka:9092
+      - dbuser=${DB_USER}
+      - dbpassword=${DB_PSWD}
+      - dburl=jdbc:postgresql://db:5432/${DB_NAME}
+      - timeoutmillis=2500
+      - topic=${TOPIC}
+    depends_on:
+      - db
+      - kafka
+      - consumer1
+      - consumer2
+      - sender
+volumes:
+  db-data:
+  zookeeper_data:
+  kafka_data:
